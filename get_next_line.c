@@ -12,53 +12,31 @@
 
 #include "get_next_line.h"
 
-int	ft_strlen(char *str)
+char	*ft_half(char **line, int i)
 {
-	int	i;
+	char	*nl;
+	int		j;
 
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-int	check_n(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '\n')
-			return (i);
-		i++;
-	}
-	return (-1);
-}
-
-char	*ft_strrdup(char **line)
-{
-	int	i;
-	char	*str;
-
-	i = 0;
-	str = malloc(ft_strlen(*line) + 1);
+	nl = malloc(ft_strlen(*line) - i);
+	if (!nl)
+		return (NULL);
+	j = 0;
+	i++;
 	while ((*line)[i])
 	{
-		str[i] = (*line)[i];
+		nl[j] = (*line)[i];
+		j++;
 		i++;
 	}
-	str[i] = 0;
+	nl[j] = 0;
 	free(*line);
-	*line = NULL;
-	return (str);
+	return (nl);
 }
 
 char	*ft_trim(char **line, int i)
 {
 	char	*str;
-	char	*nl;
-	int	j;
+	int		j;
 
 	str = malloc(i + 2);
 	j = 0;
@@ -75,20 +53,9 @@ char	*ft_trim(char **line, int i)
 	}
 	else
 	{
-		nl = malloc(ft_strlen(*line) - i);
-		if (!nl)
+		*line = ft_half(line, i);
+		if (!*line)
 			return (NULL);
-		j = 0;
-		i++;
-		while ((*line)[i])
-		{
-			nl[j] = (*line)[i];
-			j++;
-			i++;
-		}
-		nl[j] = 0;
-		free(*line);
-		*line = nl;
 	}
 	return (str);
 }
@@ -96,27 +63,17 @@ char	*ft_trim(char **line, int i)
 char	*ft_realloc_rd(char **line, int fd, int *rd)
 {
 	char	*str;
-	int	i;
-	
+	int		i;
+
 	if (!*line)
 	{
 		*line = malloc(BUFFER_SIZE + 1);
-		if(!*line)
+		if (!*line)
 			return (NULL);
 		*rd = read(fd, *line, BUFFER_SIZE);
 		if (*rd <= 0)
-		{
-			free(*line);
-			*line = NULL;
-			return (NULL);
-		}
+			return (free(*line), NULL);
 		return ((*line)[*rd] = 0, *line);
-	}
-	if (ft_strlen(*line) == 0)
-	{
-		free(*line);
-		*line = NULL;
-		return (NULL);
 	}
 	str = malloc(ft_strlen(*line) + BUFFER_SIZE + 1);
 	i = 0;
@@ -133,7 +90,7 @@ char	*ft_realloc_rd(char **line, int fd, int *rd)
 
 char	*get_next_line(int fd)
 {
-	int	rd;
+	int			rd;
 	static char	*line;
 
 	rd = 1;
@@ -145,9 +102,7 @@ char	*get_next_line(int fd)
 	while (rd > 0 || check_n(line) != -1)
 	{
 		if (check_n(line) != -1)
-		{
 			return (ft_trim(&line, check_n(line)));
-		}
 		line = ft_realloc_rd(&line, fd, &rd);
 	}
 	if (rd < 0)
