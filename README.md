@@ -19,10 +19,6 @@ Retrieve the next available line from a file descriptor, handling partial reads 
 - File descriptors
 - Memory management
 
-## Build and Usage
-
-The project files are typically integrated into another program. Refer to the repository's header files and build rules for the exact parameters and compilation requirements.
-
 ## Author
 
 Developed as part of the 42 curriculum.
